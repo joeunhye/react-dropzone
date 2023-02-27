@@ -1,5 +1,14 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {useDropzone} from 'react-dropzone';
+const btn = {
+    background: '#7900ff',
+    padding: '15px 25px',
+    borderRadius: '5px',
+    border: 'none',
+    color: '#fff',
+    fontSize: '1rem',
+    cursor: 'pointer'
+}
 
 const container = {
     width: '1000px',
@@ -113,7 +122,7 @@ function Dropzone(props) {
             <aside style={thumbsContainer}>
                 {thumbs}
             </aside>
-            {files.length > 0 && <button onClick={handleUpload}>Upload</button>}
+            {files.length > 0 && <button style={btn} onClick={handleUpload}>Upload</button>}
         </section>
     );
 }
