@@ -62,6 +62,8 @@ const img = {
 
 function Dropzone(props) {
     const [files, setFiles] = useState([]);
+    const [imgUrls, setImgUrls] = useState([])
+    const [uploadCheck, setUploadCheck] = useState(false)
     const {getRootProps, getInputProps, isDragActive} = useDropzone({
         accept: {
           'image/*': []
@@ -73,6 +75,7 @@ function Dropzone(props) {
         }
     });
 
+    console.log(imgUrls);
     
     const thumbs = files.map(file => (
         <div style={thumb} key={file.name}>
@@ -108,7 +111,11 @@ function Dropzone(props) {
                 return response.json();
             })
             .then((data) => {
-                console.log(data);
+                setUploadCheck(true)
+                setTimeout(() => {
+                    setUploadCheck(false)
+                }, 1000)
+                setImgUrls(prev => [...prev, data.url])
             });
         }
     }
@@ -122,7 +129,17 @@ function Dropzone(props) {
             <aside style={thumbsContainer}>
                 {thumbs}
             </aside>
+            {uploadCheck && <p>업로드 완료 👍</p>}
             {files.length > 0 && <button style={btn} onClick={handleUpload}>Upload</button>}
+            {imgUrls.length > 0 && 
+                <div>
+                    <h2>My Background</h2>
+                    <ul>
+                        {imgUrls.map((img, idx) => <li key={idx}><img src={img} alt="" /></li>)}
+                    </ul>
+                </div>
+            }
+            
         </section>
     );
 }
