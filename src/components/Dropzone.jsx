@@ -20,6 +20,7 @@ const dropzone = {
     flexDirection: 'column',
     alignItems: 'center',
     padding: '20px',
+    marginBottom: '20px',
     borderWidth: '2px',
     borderRadius: '2px',
     borderColor: '#eeeeee',
@@ -60,22 +61,56 @@ const img = {
     height: '100%'
 };
 
+const thumblist = {
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: '10px'
+}
+const thumblistitem = {
+    listStyleType: 'none',
+    width: '200px',
+    height: '200px',
+    overflow: 'hidden'
+}
+const thumblistimg = {
+    width: '200px',
+    height: '200px',
+    objectFit: 'cover'
+}
+
 function Dropzone(props) {
     const [files, setFiles] = useState([]);
+    const [images, setImages] = useState([]);
     const [imgUrls, setImgUrls] = useState([])
-    const [uploadCheck, setUploadCheck] = useState(false)
+    const [uploadCheck, setUploadCheck] = useState(false);
     const {getRootProps, getInputProps, isDragActive} = useDropzone({
         accept: {
-          'image/*': []
+            'image/*': []
         },
-        onDrop: acceptedFiles => {
-          setFiles(acceptedFiles.map(file => Object.assign(file, {
-            preview: URL.createObjectURL(file)
-          })));
+
+        // onDrop: acceptedFiles => {
+        //     setFiles(acceptedFiles.map(file => Object.assign(file, {
+        //         preview: URL.createObjectURL(file)
+        //     })));
+        // }
+
+        onDrop : (acceptedFiles) => {
+            acceptedFiles.map((file, index) => {
+                setFiles(acceptedFiles.map(file => Object.assign(file, {
+                    preview: URL.createObjectURL(file)
+                })));
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    setImages(prevState => [...prevState, {id: index, src: e.target.result}])
+                }
+                reader.readAsDataURL(file)
+                return file;
+            })
         }
     });
 
-    console.log(imgUrls);
+    console.log(images);
     
     const thumbs = files.map(file => (
         <div style={thumb} key={file.name}>
@@ -98,7 +133,6 @@ function Dropzone(props) {
     const handleUpload = async () =>  {
         const url = `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_NAME}/image/upload`;
         const formData = new FormData();
-
         for(let i = 0; i < files.length; i++) {
             let file = files[i];
             formData.append("file", file);
@@ -115,8 +149,9 @@ function Dropzone(props) {
                 setTimeout(() => {
                     setUploadCheck(false)
                 }, 1000)
-                setImgUrls(prev => [...prev, data.url])
-            });
+                // setImgUrls(prev => [...prev, data.url])
+            })
+            
         }
     }
 
@@ -126,20 +161,19 @@ function Dropzone(props) {
                 <input {...getInputProps()} />
                 <p>Drag 'n' drop some files here, or click to select files</p>
             </div>
-            <aside style={thumbsContainer}>
+            {/* <aside style={thumbsContainer}>
                 {thumbs}
-            </aside>
+            </aside> */}
             {uploadCheck && <p>업로드 완료 👍</p>}
             {files.length > 0 && <button style={btn} onClick={handleUpload}>Upload</button>}
-            {imgUrls.length > 0 && 
+            {images.length > 0 && 
                 <div>
-                    <h2>My Background</h2>
-                    <ul>
-                        {imgUrls.map((img, idx) => <li key={idx}><img src={img} alt="" /></li>)}
+                    <h2>Thumbs Preview</h2>
+                    <ul style={thumblist}>
+                        {images.map((img, idx) => <li key={idx} style={thumblistitem}><img src={img.src} alt="" style={thumblistimg} /></li>)}
                     </ul>
                 </div>
             }
-            
         </section>
     );
 }
