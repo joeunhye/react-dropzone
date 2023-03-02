@@ -31,27 +31,6 @@ function Dropzone() {
 		onDrop,
 	});
 
-	
-
-	// const thumbs = files.map(file => (
-	// 	<div style={thumb} key={file.name}>
-	// 		<div style={thumbInner}>
-	// 			<img
-	// 				src={file.preview}
-	// 				style={img}
-	// 				// Revoke data uri after image is loaded
-	// 				onLoad={() => {
-	// 					URL.revokeObjectURL(file.preview);
-	// 				}}
-	// 				alt=""
-	// 			/>
-	// 		</div>
-	// 		<button onClick={removeFile(file)} style={remove}>
-	// 			-
-	// 		</button>
-	// 	</div>
-	// ));
-
 	useEffect(() => {
 		localStorage.setItem("bg", JSON.stringify(localFiles));
 		// Make sure to revoke the data uris to avoid memory leaks, will run on unmount
