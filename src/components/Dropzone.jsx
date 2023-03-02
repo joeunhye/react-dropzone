@@ -1,85 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react";
 import axios from "axios";
-
+import styles from './Dropzone.module.scss'
 import { useDropzone } from "react-dropzone";
-const btn = {
-	background: "#7900ff",
-	padding: "15px 25px",
-	borderRadius: "5px",
-	border: "none",
-	color: "#fff",
-	fontSize: "1rem",
-	cursor: "pointer",
-};
-
-const container = {
-	width: "1000px",
-	margin: "0 auto",
-};
-const dropzone = {
-	flex: 1,
-	display: "flex",
-	flexDirection: "column",
-	alignItems: "center",
-	padding: "20px",
-	marginBottom: "20px",
-	borderWidth: "2px",
-	borderRadius: "2px",
-	borderColor: "#eeeeee",
-	borderStyle: "dashed",
-	backgroundColor: "#fafafa",
-	color: "#bdbdbd",
-	outline: "none",
-	transition: "border .24s ease-in-out",
-};
-const thumbsContainer = {
-	display: "flex",
-	flexDirection: "row",
-	flexWrap: "wrap",
-	marginTop: 16,
-};
-
-const thumb = {
-	position: "relative",
-	display: "inline-flex",
-	borderRadius: 2,
-	border: "1px solid #eaeaea",
-	marginBottom: 8,
-	marginRight: 8,
-	width: 100,
-	height: 100,
-	padding: 4,
-	boxSizing: "border-box",
-};
-
-const thumbInner = {
-	display: "flex",
-	minWidth: 0,
-	overflow: "hidden",
-};
-
-const img = {
-	display: "block",
-	width: "90px",
-	height: "100%",
-	objectFit: "cover",
-};
-
-const remove = {
-	position: "absolute",
-	right: "-5px",
-	top: "-5px",
-	background: "#eb3c30",
-	borderRadius: "50%",
-	color: "#fff",
-	border: "none",
-	fontSize: "20px",
-	width: "20px",
-	height: "20px",
-	display: "flex",
-	alignItems: "center",
-	justifyContent: "center",
-};
+import Thumbs from "./Thumbs";
 
 function Dropzone() {
 	const getBg = () => {
@@ -108,30 +31,26 @@ function Dropzone() {
 		onDrop,
 	});
 
-	const removeFile = file => () => {
-		const newFiles = [...files];
-		newFiles.splice(newFiles.indexOf(file), 1);
-		setFiles(newFiles);
-	};
+	
 
-	const thumbs = files.map(file => (
-		<div style={thumb} key={file.name}>
-			<div style={thumbInner}>
-				<img
-					src={file.preview}
-					style={img}
-					// Revoke data uri after image is loaded
-					onLoad={() => {
-						URL.revokeObjectURL(file.preview);
-					}}
-					alt=""
-				/>
-			</div>
-			<button onClick={removeFile(file)} style={remove}>
-				-
-			</button>
-		</div>
-	));
+	// const thumbs = files.map(file => (
+	// 	<div style={thumb} key={file.name}>
+	// 		<div style={thumbInner}>
+	// 			<img
+	// 				src={file.preview}
+	// 				style={img}
+	// 				// Revoke data uri after image is loaded
+	// 				onLoad={() => {
+	// 					URL.revokeObjectURL(file.preview);
+	// 				}}
+	// 				alt=""
+	// 			/>
+	// 		</div>
+	// 		<button onClick={removeFile(file)} style={remove}>
+	// 			-
+	// 		</button>
+	// 	</div>
+	// ));
 
 	useEffect(() => {
 		localStorage.setItem("bg", JSON.stringify(localFiles));
@@ -176,17 +95,21 @@ function Dropzone() {
 	};
 	console.log(localFiles);
 	return (
-		<section style={container}>
-			<div {...getRootProps()} style={dropzone}>
+		<section className={styles.container}>
+			<div {...getRootProps()} className={styles.dropzone}>
 				<input {...getInputProps()} />
 				<p>Drag 'n' drop some files here, or click to select files</p>
 			</div>
-			<aside style={thumbsContainer}>{thumbs}</aside>
+			<aside className={styles.thumbsContainer}>
+                {
+                    files.map(file => <Thumbs file={file} files={files} key={file.name} setFiles={setFiles} />)
+                }
+            </aside>
 
 			{loading && <p>업로드 중</p>}
 			{uploadCheck && <p>업로드 완료 👍</p>}
 			{files.length > 0 && (
-				<button style={btn} onClick={handleUpload}>
+				<button className={styles.btn} onClick={handleUpload}>
 					Upload
 				</button>
 			)}
