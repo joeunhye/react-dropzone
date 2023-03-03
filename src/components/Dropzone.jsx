@@ -3,6 +3,7 @@ import axios from "axios";
 import styles from './Dropzone.module.scss'
 import { useDropzone } from "react-dropzone";
 import Thumbs from "./Thumbs";
+import ImgList from "./ImgList";
 
 function Dropzone() {
 	const getBg = () => {
@@ -54,9 +55,7 @@ function Dropzone() {
 				await axios
 					.post(url, formData, config) //
 					.then(response => {
-						setlocalFiles(prev => [...prev, response.data.secure_url]);
-						console.log(response.data);
-						localStorage.setItem("bg", JSON.stringify(localFiles));
+						setlocalFiles(prev => [...prev, response.data]);
 					});
 			} catch (error) {
 				console.error(error);
@@ -72,7 +71,10 @@ function Dropzone() {
 			setFiles([]);
 		});
 	};
-	console.log(localFiles);
+	const handleImgRemove = (file) => {
+		console.log(file.asset_id);
+		setlocalFiles(localFiles.filter(localFile => localFile.asset_id !== file.asset_id))
+	}
 	return (
 		<section className={styles.container}>
 			<div {...getRootProps()} className={styles.dropzone}>
@@ -92,9 +94,14 @@ function Dropzone() {
 					Upload
 				</button>
 			)}
-			{localFiles.map((el, idx) => (
-				<img src={el} key={idx} alt="" />
-			))}
+			<hr />
+			<h3>나의 이미지 목록</h3>
+			{localFiles.length === 0 && <p className={styles.imgEmpty}>등록된 이미지가 없습니다.</p>}
+			<ul className={styles.thumbnailList}>
+				{localFiles.map(file => (
+					<ImgList key={file.asset_id} file={file} onDelete={handleImgRemove} />
+				))}
+			</ul>
 		</section>
 	);
 }
