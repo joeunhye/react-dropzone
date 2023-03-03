@@ -15,6 +15,7 @@ function Dropzone() {
 	const [loading, setLoading] = useState(false);
 	const [uploadCheck, setUploadCheck] = useState(false);
 
+	//이미지 파일 드래그 앤 드롭 영역
 	const onDrop = useCallback(acceptedFiles => {
 		setFiles(
 			acceptedFiles.map(file =>
@@ -38,6 +39,10 @@ function Dropzone() {
 		return () => files.forEach(file => URL.revokeObjectURL(file.preview));
 	}, [files, localFiles]);
 
+	// 이미지 목록 갯수
+	const length = localFiles.length;
+
+	// 이미지 업로드
 	const handleUpload = async () => {
 		setLoading(true);
 		const url = `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_NAME}/image/upload`;
@@ -71,8 +76,9 @@ function Dropzone() {
 			setFiles([]);
 		});
 	};
+
+	// 이미지 제거
 	const handleImgRemove = (file) => {
-		console.log(file.asset_id);
 		setlocalFiles(localFiles.filter(localFile => localFile.asset_id !== file.asset_id))
 	}
 	return (
@@ -95,7 +101,7 @@ function Dropzone() {
 				</button>
 			)}
 			<hr />
-			<h3>나의 이미지 목록</h3>
+			<h3>나의 이미지 목록 ({length})</h3>
 			{localFiles.length === 0 && <p className={styles.imgEmpty}>등록된 이미지가 없습니다.</p>}
 			<ul className={styles.thumbnailList}>
 				{localFiles.map(file => (
