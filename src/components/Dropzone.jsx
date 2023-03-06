@@ -14,9 +14,13 @@ function Dropzone() {
 	const [localFiles, setlocalFiles] = useState(getBg);
 	const [loading, setLoading] = useState(false);
 	const [uploadCheck, setUploadCheck] = useState(false);
+	const [error, setError] = useState(false);
+	const [errorImg, setErrorImg] = useState(0);
 
 	//이미지 파일 드래그 앤 드롭 영역
 	const onDrop = useCallback(acceptedFiles => {
+		setError(false)
+		setLoading(false)
 		setFiles(
 			acceptedFiles.map(file =>
 				Object.assign(file, {
@@ -57,24 +61,23 @@ function Dropzone() {
 			formData.append("upload_preset", process.env.REACT_APP_UPLOAD_PRESET);
 
 			try {
-				await axios
-					.post(url, formData, config) //
-					.then(response => {
-						setlocalFiles(prev => [...prev, response.data]);
-					});
+				const response = await axios.post(url, formData, config)
+    			const files = response.data;
+				setlocalFiles(prev => [...prev, files])
 			} catch (error) {
-				console.error(error);
+				setErrorImg(prev => prev + 1)
+				setError(true);
+				return;
 			}
 		});
 
-		axios.all(uploaders).then(() => {
-			setUploadCheck(true);
-			setLoading(false);
-			setTimeout(() => {
-				setUploadCheck(false);
-			}, 1000);
-			setFiles([]);
-		});
+		await axios.all(uploaders);
+		setUploadCheck(true);
+		setLoading(false);
+		setTimeout(() => {
+			setUploadCheck(false);
+		}, 1000);
+		setFiles([]);
 	};
 
 	// 이미지 제거
@@ -94,7 +97,9 @@ function Dropzone() {
             </aside>
 
 			{loading && <p>업로드 중</p>}
-			{uploadCheck && <p>업로드 완료 👍</p>}
+			{/* {uploadCheck && <p>업로드 완료 👍</p>} */}
+			{error && <p>업로드 실패 ❌... 업로드 실패한 이미지가 있습니다! 업로드를 다시 시도해주세요.</p>}
+			{error && errorImg > 0 && <p>업로드 실패 이미지 개수 ({errorImg})</p>}
 			{files.length > 0 && (
 				<button className={styles.btn} onClick={handleUpload}>
 					Upload
